@@ -58,7 +58,8 @@ method = st.sidebar.radio(
 )
 n = st.sidebar.slider("Number of recommendations", 5, 20, 10)
 
-title = st.selectbox("Select a movie", rec.titles)
+default = rec.titles.index("Toy Story (1995)")
+title = st.selectbox("Select a movie", rec.titles, index=default)
 
 # details of the selected movie
 selected_id = rec.movies.loc[rec.title_to_idx[title], "movieId"]
@@ -79,10 +80,11 @@ if st.button("Recommend"):
         result = rec.collaborative(title, n)
 
     if result is None:
-        st.warning("This movie has too few ratings for collaborative filtering. Try content-based.")
-    else:
-        st.subheader("You might also like")
-        show_cards(result)
+        st.warning("Too few ratings for collaborative filtering on this movie, showing content-based results instead.")
+        result = rec.content_based(title, n)
+
+    st.subheader("You might also like")
+    show_cards(result)
 
 st.markdown("---")
 st.caption("Data: MovieLens (GroupLens). Posters and details: TMDB. "
